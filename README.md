@@ -1,405 +1,165 @@
+# **Blockhead Documentation**
 
-***
-# Overview
+## **Overview**
 
-Blockhead is building an open source, permissionless and reputation bound payment processor on polygon. payments will initially be made in matic.
+**Blockhead** is an open-source, permissionless, and reputation-bound payment processor built on the **Polygon network**. It allows for secure, trustless payments between users, with payment dispute resolution handled by **Marketplace Oracles**. Blockhead is built for scalability, transparency, and decentralized trust, making it an ideal platform for handling crypto payments within decentralized marketplaces.
 
-Blockhead enables safe crypto payments with no-trust code and dispute settlement by oracle. Blockhead is permissionless yet effectively bound by by the reputation data held in the oracles.
+The platform uses **MATIC** as its base currency for transactions and incorporates a **reputation-based model** for users (via oracles) to ensure fair dispute resolution and effective payment processing.
 
-At the heart of the system is:
+---
 
-`the website` blockhead.box, an ipfs hosted react static page website that manages invoices for users logged in with a polygon compatible wallet.
+## **Key System Components**
 
-`the smart contracts` solidity contracts that direct payments to parties in accordance with the Marketplace Oracles
+### **1. Website (blockhead.box)**  
+The **blockhead.box** website is a **React**-based static page hosted on **IPFS**. It provides the following functionalities:
 
-`the Escrow Wallet` where payments are stored before release
+- **Invoice Management**: Users can create, view, accept, and cancel invoices.
+- **User Login**: Wallet-based login via **WalletConnect**, allowing users to interact with the platform in a secure and decentralized manner.
+- **Invoice Payment**: Invoice payers can view invoice details and make payments securely.
+- **Admin Panel**: A secure admin interface to configure settings like the **escrow wallet**, **oracle addresses**, and **gas fees**.
 
-`Marketplace oracles` which:
+### **2. Smart Contracts (Solidity)**  
+The **smart contracts** are the backbone of Blockhead's decentralized payment processing. They handle:
 
-i) deliver invoice data to the smart contracts
+- **Invoice Creation**: Smart contracts generate and store invoice data and ensure funds are held in escrow until all conditions are met.
+- **Escrow Wallet Management**: Funds are held in a secure escrow wallet until they are released or refunded based on the invoice creator's and payer’s actions.
+- **Dispute Resolution**: Marketplace Oracles trigger the reallocation of funds in case of disputes.
+- **Payment State Transitions**: The smart contracts monitor payment status and update invoice states (e.g., **Paid**, **Accepted**, **Cancelled**, etc.).
 
-ii) determine escrow hold periods for Invoice Creators
+### **3. Escrow Wallet**  
+The **Escrow Wallet** is used to hold funds temporarily before they are released to the invoice creator or refunded to the payer. The wallet's address is generated deterministically using an admin-configured key, ensuring a secure, unique address for each transaction.
 
-iii) determine post-dispute allocations.
+- **Escrow Address Generation**: Each invoice creates a unique wallet address based on the smart contract's logic.
+- **Hold Period**: The smart contract determines the hold period, based on either the marketplace oracle’s configuration or the settings set by the Blockhead admin.
+  
+### **4. Marketplace Oracles**  
+Marketplace Oracles play a crucial role in creating and managing invoices, as well as resolving disputes. Oracles in the Blockhead ecosystem provide additional functionalities, including:
 
-example market: littlebiggy.net
+- **Invoice Creation**: Marketplace oracles create invoices on behalf of sellers and include additional parameters, such as custom invoice terms and dispute resolution rules.
+- **Hold Periods**: Oracles can set custom hold periods for invoices based on the marketplace's rules.
+- **Dispute Resolution**: If an invoice is disputed, the oracle can trigger fund reallocations from the **Escrow Wallet** to either the creator or the payer.
 
-`Blockchain Oracles` which monitor blockchains for updates on payments
+**Example Oracle Network**: **Chainlink** (permissionless oracle network)
 
-***
+### **5. Blockchain Oracles**  
+Blockchain Oracles monitor the blockchain for updates regarding payments. These oracles:
 
+- **Monitor Payments**: They track transactions on the blockchain to confirm payments to the Escrow Wallet and update invoice statuses accordingly.
+- **State Changes**: Based on payment detection, they trigger state transitions in the invoice (e.g., from **Created** to **Paid** or **Underpaid**).
+  
+---
 
-# Developer Payments
+## **Developer Payments**
 
-### **$30,000 + bonus**
+### **$30,000 + Bonus**
 
-## **Phase 0: specification and platform** 
+#### **Phase 0: Specification and Platform**
 
-edit and complete this specification
+- **Task**: Edit and complete the documentation, establish wireframes for the landing page, and implement wallet login functionality.
+- **Payment**: $1,500 + bonus
 
-establish blockheadverifybytoken.eth ipfs site wireframe landing page
+#### **Phase 1: Basic Functions and Smart Contracts**
 
-establish wallet login
+- Invoice management (create, accept, cancel)
+- **Payer Functionality**: Invoice payment and release
+- **Admin Functions**: Configure oracle, escrow, and set gas fees
+- **Payment**: $5,000  
+- **Documentation Completion**: $1,000  
+- **Audit 1 Completion**: $3,000  
+- **Total for Phase 1**: $9,000 + bonus
 
-1.5k+bonus
+#### **Phase 2: User-Enabling Functions and Smart Contracts**
 
+- Invoice list, search, and sorting
+- Refund functions (overpay, cancel)
+- Marketplace oracle orders and dispute allocations
+- Gas fee configuration, fiat conversion
+- **Payment**: $5,000  
+- **Documentation Completion**: $1,000  
+- **Audit 2 Completion**: $3,000  
+- **Total for Phase 2**: $9,000 + bonus
 
+#### **Phase 3: Additional Functions and Contracts**
 
-## **Phase 1: basic functions and accompanying smart contracts added to wireframe**
+- Admin transfer, second admin confirmation
+- ZK Rollups, user-set terms
+- Marketplace oracle hold periods, more site features
+- **Payment**: Estimated $8,000 + bonus
 
-basic admin functions
+---
 
-logged in creator : invoice creation
+## **System Architecture and Interactions**
 
-  invoice acceptance
+### **1. Admin Functions**
 
-  invoice cancellation
+**Blockhead Admin** has control over the system settings via a secure admin panel (accessed via **blockhead.box/admin**). Admin functions include:
 
-logged in payer: invoice payment
+- **Admin Login**: A secure login process using wallet-based authentication. The first admin key and confirmation key are encoded within the smart contract.
+- **Transfer Admin**: Admin can transfer control using a second confirmation key for extra security.
+- **Shut Off Switch**: Temporarily disables all operations in case of emergency or maintenance.
+- **Configure Oracle**: Admin can configure the **Marketplace Oracle** address that governs invoice creation and dispute resolution.
+- **Set Gas Fee**: Admin can configure a fixed gas fee, and adjust it in extreme network conditions (Phase 2 will automate this process based on real-time data).
+- **Escrow Management**: Admin configures the **Escrow Wallet** address and sets the **Blockhead Fee Margin**.
 
-invoice release
+---
 
-$5,000
+### **2. Invoice Management**
 
-documentation completion: $1,000
+**Invoice Creation**:
 
-pass audit 1 : $3,000
+1. **Invoice Data Input**:
+   - **Amount** (in MATIC)
+   - **Expiration** (maximum of 180 days)
+   - **Release Address** (where funds will be sent upon release)
+   - **Public Key** (for added security)
 
-total - $9,000 + bonus
+2. **Smart Contract Integration**:
+   The smart contract automatically adds:
+   - **Escrow Wallet Address**
+   - **Release Date**
+   - **Invoice ID**
+   - **Payment URL and QR code** for easy access.
 
+3. **Blockchain Oracle Monitoring**:  
+   The **Blockchain Oracle** monitors the blockchain to check for incoming payments. It continuously checks the blockchain until payment is received or the invoice expires.
 
+---
 
-## **Phase 2 user enabling functions and smart contracts added** 
+### **3. Payment Process**
 
-invoice list
+1. **Payment Detection**:  
+   Once the payer makes a payment, the **Blockchain Oracle** detects it and updates the invoice status (e.g., **Paid**, **Underpaid**).
+  
+2. **Invoice Acceptance**:  
+   The **Invoice Creator** reviews the payment. If the payment is underpaid, they can either accept the payment or cancel the invoice. If the payment is overpaid, the excess is refunded to the payer.
 
-overpay refund fxs
+3. **Invoice Release**:  
+   The invoice is released to the **Invoice Creator** once all conditions are met (e.g., invoice is accepted, hold period expired).
 
-cancel refund fxs
+---
 
-marketplace oracle orders
+### **4. Marketplace Oracle Functionality**
 
-marketplace oracle dispute allocations
+Marketplace oracles are responsible for:
 
-marketplace pay page api integration
+- **Invoice Creation**: Marketplace Oracles create invoices that include all relevant details, such as invoice terms, hold periods, and dispute resolution rules.
+- **Dispute Resolution**: In the event of a dispute, oracles can adjust the invoice’s release timing and allocate funds accordingly.
+- **Hold Period Configuration**: Oracles can set specific hold periods for individual invoices or rely on the default set by the admin.
 
-admin shut off switch
+---
 
-set gas fee
+### **5. Escrow Wallet Interaction**
 
-fiat conversion
+Each invoice generates a unique escrow wallet address for the payment to be sent to. The **Escrow Wallet** holds funds until all conditions are met:
 
-$5,000
+- **Invoice Acceptance**: Funds are released to the **Invoice Creator** once the invoice is accepted.
+- **Refund Conditions**: If a payment is underpaid or the invoice is canceled, funds are refunded to the **Invoice Payer**.
+- **Dispute-Triggered Releases**: If there is a dispute, the **Marketplace Oracle** can reallocate funds to either the creator or the payer.
 
-documentation complete: $1,000
+---
 
-pass audit 2 : $3,000
+### **6. Notifications and Messaging**
 
-$9,000 + bonus total
+- **Marketplace Oracle Notifications**: Oracles provide updates on the status of disputes, invoice payments, and any changes to the payment state.
+- **Wallet Messaging** (Phase 3): This feature will allow for direct notifications sent to users through their wallets to update them on invoice statuses, disputes, and releases.
 
-
-
-## **Phase 3 additional functions, contracts**
-
-transfer admin
-
-2nd admin confirmation required
-
-zk rollups
-
-marketplace oracle sets hold periods for individual invoice creators
-
-user set terms
-
-more site fxs
-
-disposals from failed transactions
-
-pass audit 3
-
-estimated $8,000 +bonus
-
-
-***
-
-# Functions
-
-Business rules and their related functions are contextualized through the basic actions of Admin, Seller, and Buyer users.
-
-## Admin Functions
-
-admin functions are controlled from blockhead.box/admin
-
-
-`Admin Login` the first admin key and confirmation key is encoded within the smart contract.
-
-`Transfer admin` the admin key and confirmation key can be changed with a 2nd confirmation
-
-`Shut off Switch` pauses all operations
-
-`Configure Oracle` enters address for marketplace oracle
-
-`2nd admin confirmation` additional signature for certain admin fxs
-
-`Configure Escrow Address` sets address for escrow wallet
-
-`Configure Blockhead Fee Margin %`
-
-`Set Gas Fee` (a control is always necessary under extreme network conditions)
-
-`Set Blockhead Wallet Address` for paying gas fees and collecting blockhead fees
-
-`Hold Time` sets time to release for all contracts.
-
-individual holds for invoice creators from market oracle **(phase 2)**
-
-`Set Market Oracle`
-
-`Blacklist` sets wallet addresses that can not create invoices
-
-`Trigger Events` resend interrupted transactions
-
-`Set Circuit Breakers` in smart contract
-
-***
-
-
-## Invoice Creation
-
-The Invoice Creator is typically a seller of goods/services; the Invoice Payer is a corresponding buyer.
-
-Sequence: to build an invoice @blockhead.box/invoice/create
-
-Creator enters Invoice data:
-
-* Amount in matic
-
-* Expiration - entry limit 180 days
-
-Additional data is captured from Creator's wallet:
-
-* Release Address
-
-* Public Key
-
-Additional data derived from admin configuration is added to contract:
-
-* Release Date
-
-* Escrow Wallet Address
-
-* Market Oracle (If invoice created by Market Oracle)
-
-Upon validation The Smart Contract generates and displays on page:
-
-* A unique Invoice ID
-
-* A unique Payment Address from the Escrow Wallet (these can be identifiers of our own or simply the associated keys/wallet addresses)
-
-* A blockhead.box/invoice/pay url and QR
-
-The Blockchain Oracle then begins querying the blockchain for payments until expiry
-
-Creators then shares the invoice url with Payer
-
-***
-
-
-## Marketplace Oracles
-
-`Preferred Oracle Network:  Chainlink (permissionless)`
-
-1) Marketplace Oracles create invoices on Blockhead including all the fields that an individual Invoice Creator would submit + conditions text + invoice hold period (otherwise a blockhead admin configuration) + Invoice Payer Address
-
-2) Invoices created by a Marketplace Oracle can be disputed before release. In such cases the Marketplace Oracle can change release timing and re-allocate funds from the Release to the Invoice Payer Address.
-
-***
-
-
-## Invoice Payment
-
-Sequentially: Invoice Payer has
-
-* received a url for invoice payment from the Invoice Creator
-
-* logged in with their wallet (not required for Marketplace Invoices which arrive via the Marketplace Oracle )
-
-Smart Contract and its related entities have
-
-* generated a unique invoice address from the Escrow Wallet
-
-* begun monitoring for payments via the Blockchain Oracle
-
-* (If Marketplace Invoice) emitted an event sending the payment url to the Marketplace
-
-The Invoice Payment
-The Blockchain Oracle monitors the blockchain and along with commands from the website sets appropriate state changes from Created to:
-
-* Payment Received -> awaits Invoice Creator command: Accept Payment.
-
-* Depending upon the amount received the state can change to:
-
-* Underpaid
-
-* Overpaid
-
-Creator can accept invoices paid within 3 days, then the Invoice state changes to Refund Pending.
-Payments received after cancellation are refunded.
-
-***
-
-
-## Invoice Acceptance & Cancellation
-
-Creators, Oracles and system rules evoke state changes for Invoices:
-
-Paid
-
-Accepted
-
-Cancelled by Creator
-
-Cancelled by Marketplace Oracle (buyer or seller can cancel an order)
-
-Awaiting Marketplace Oracle Allocation (when a dispute is being settled within the marketplace)
-
-Cancelled by Timeout Creator
-
-Cancelled by Timeout Payer
-
-***
-
-
-## Invoice Release
-
-Invoice releases are the executions of our smart contracts.
-
-
-
-Conditions required for release from Escrow Wallet to Invoice Creator:
-
-Invoice accepted by Invoice Created
-
-Hold period exceeded
-
-
-
-Conditions required for release from escrow wallet to Invoice payer:
-
-Refund state from:
-
-paid invoice not accepted
-
-invoice overpayment amount
-
-late payment
-
-
-
-Conditions required for Execution by Marketplace Oracle
-
-Invoice Disputed
-
-***
-
-
-## Under and Over Payments
-
-Underpayments can be Accepted by the Creator or the invoice can be cancelled
-
-Overpayments greater than required gas fees are automatically refunded to the Payer's address
-
-***
-
-
-## Disputed Invoices
-
-**Phase 2**
-
-Unreleased Invoices (anything still in escrow/awaiting release) are subject to release re-allocation between Creator and Payer by the Marketplace Oracle, ostensibly in the case of a dispute.
-
-***
-
-
-## Refund Functions
-
-Refund functions are applied immediately when 
-
-* an invoice is underpaid by an amount in excess of gas fees 
-
-* cancelled by either party.
-
-* funds are allocated to Payer from oracular re-allocation
-
-Refunds are sent to the Payer's sending address. 
-
-***
-
-
-## Invoice List
-
-Logged in Creators or Payers access:
-
-a list with sortable headings:
-
-status, (date) created, (date) paid, creator id payer id
-
-and a search function by:
-
-invoice id, invoice address, state, creator id, payer id
-
-***
-
-
-## Website
-
-blockhead.box is a react static page website, hosted on ipfs, 
-
-`wallet login provider:` wallet connect
-
-`hosting:` fleek or 4everland
-
-`test server:` vercel
-
-`style resources:` bootstrap, right sidebar responsive site.  basic styling until phase 3
-
-`.box domain management:` my.box and 3dns.box
-
-
-
-`the default landing page:` requires explanation text, login, link to our github
-
-`pay invoice page:` Invoice Payers are given a url from Invoice Creators to land on this page which shows all of the invoice details except the pay to address which requires login/wallet connection
-
-`navbar:` links to create invoice, invoice list, find, admin (conditional to wallet key)
-
-`invoice list`
-
-`create invoice page`
-
-`invoice page:` displays current state and history, creators can cancel invoice here
-
-`invoice pay page:` note login is still required to display this direct linked page
-
-`admin page`
-
-***
-
-
-## Escrow Wallet
-
-The Escrow wallet holds payments until release; the escrow wallet is set by the admin. each invoice payment receives a new address for this wallet.
-
-The receiving address for the wallet is deterministic. The addresses are derived from a key set by the admin and subject to security limitations in **(phase 2)**
-
-***
-
-
-## Notifications
-
-Through Marketplace Oracle (phase 2)
-
-Through Wallet Messaging (phase 3)
-
-
-***
