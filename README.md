@@ -1,308 +1,383 @@
-### **Detailed Blockhead Specification**
-
----
+# **Blockhead Payment Processor Specifications**
 
 ## **Overview**
 
-Blockhead is an open-source, permissionless payment processing platform that operates on the Polygon blockchain. It facilitates trustless cryptocurrency payments, secured by smart contracts, with dispute resolution handled by oracles.
+Blockhead is an open-source, permissionless, reputation-based payment processor built on Polygon. Payments are processed in MATIC, utilizing secure escrow mechanisms, decentralized oracle integrations, and no-trust smart contracts to manage disputes and automate settlements.
 
-### Core Components:
-1. **Website**: A React-based static page hosted on IPFS that manages invoices for users, who can log in using a Polygon-compatible wallet (e.g., MetaMask, WalletConnect).
-2. **Smart Contracts**: Solidity-based smart contracts that handle the entire invoicing process, including payment routing, escrow holding, and dispute resolution by Marketplace Oracles.
-3. **Escrow Wallet**: A temporary holding wallet for funds before they are released to the recipient.
-4. **Marketplace Oracles**: Oracles that facilitate invoice creation, manage invoice hold periods, and resolve disputes.
+Key Objectives:
+- Enable secure payments with minimal trust requirements.
+- Provide a scalable, decentralized framework for crypto invoicing.
+- Automate dispute resolution through Marketplace Oracles.
 
-Example Marketplace: **littlebiggy.net**
+### **Key Components**
+1. **Website (`blockhead.box`):**  
+   IPFS-hosted React app for invoice creation, payment management, and dispute handling.
+   
+2. **Smart Contracts:**  
+   Solidity-based contracts to manage invoice lifecycle, escrow operations, and integration with oracles.
+
+3. **Escrow Wallet:**  
+   A deterministic, secure wallet for temporarily holding funds until release conditions are met.
+
+4. **Oracles:**  
+   - **Marketplace Oracles:** Manage invoices, disputes, and hold periods.
+   - **Blockchain Oracles:** Monitor payment states and trigger smart contract actions.
 
 ---
 
-## **Developer Payments**
-
-### **Total Payment**: $30,000 + Bonus
+## **Project Development Phases**
 
 ### **Phase 0: Specification and Platform Setup**
+**Objectives:**
+- Finalize specifications.
+- Establish IPFS-hosted landing page (`blockheadverifybytoken.eth`).
+- Enable wallet-based authentication.
 
-1. Edit and complete the detailed technical specification document.
-2. Implement and deploy the landing page wireframe (`blockheadverifybytoken.eth`) on IPFS.
-3. Implement wallet login functionality using **WalletConnect** or similar protocols (e.g., MetaMask).
-   
-**Payment**: $1,500 + Bonus
+**Deliverables:**
+- Wireframe for IPFS landing page.
+- Functional wallet login integrated with Polygon network.
 
----
-
-### **Phase 1: Basic Functions and Smart Contracts**
-
-1. Implement basic admin functions.
-2. Implement basic functions for **Invoice Creators** (invoice creation, acceptance, and cancellation).
-3. Implement basic functions for **Invoice Payers** (invoice payment and release).
-   
-**Payment**: $5,000  
-**Documentation Completion**: $1,000  
-**Pass Audit 1**: $3,000  
-**Total for Phase 1**: $9,000 + Bonus
+**Budget:**  
+- $1,500 + bonus.
 
 ---
 
-### **Phase 2: User-Enabled Functions and Smart Contracts**
+### **Phase 1: Basic Features and Smart Contracts**
+**Objectives:**
+- Implement foundational functionality for admins, creators, and payers.
+- Deploy basic smart contracts to manage invoice creation, payment, and state transitions.
+- Conduct initial audit to verify smart contract security.
 
-1. Implement invoice list management (sortable and searchable).
-2. Implement overpay and cancel refund functions.
-3. Implement marketplace oracle orders and dispute allocations.
-4. Implement marketplace pay page API integration.
-5. Implement admin shut-off switch, gas fee setting, and fiat conversion.
+**Deliverables:**
+1. **Features:**  
+   - **Invoice Management:** Creation, acceptance, and cancellation.  
+   - **Payment Handling:** Monitor payments and manage state changes.  
+   - **Admin Controls:** Configure key settings like fees and escrow wallet.
 
-**Payment**: $5,000  
-**Documentation Completion**: $1,000  
-**Pass Audit 2**: $3,000  
-**Total for Phase 2**: $9,000 + Bonus
+2. **Documentation:**  
+   Comprehensive guide to smart contract methods, API endpoints, and frontend features.
+
+3. **Security Audit:**  
+   Pass Audit 1 with third-party verification.
+
+**Budget Breakdown:**  
+- Implementation: $5,000  
+- Documentation: $1,000  
+- Audit 1: $3,000  
+
+**Total:** $9,000 + bonus.
 
 ---
 
-### **Phase 3: Additional Functions and Contracts**
+### **Phase 2: Advanced Features and Integrations**
+**Objectives:**
+- Introduce advanced user workflows and refund mechanisms.
+- Enable Marketplace Oracle integrations for disputes and custom hold periods.
+- Support fiat conversion and external payment gateways.
 
-1. Implement admin transfer functions and a second admin confirmation requirement.
-2. Implement ZK rollups.
-3. Implement marketplace oracle hold periods for individual invoice creators.
-4. Implement user-set invoice terms and additional website features.
-5. Implement handling of failed transactions.
+**Deliverables:**
+1. **Features:**  
+   - Refund management for underpayments, overpayments, and cancellations.  
+   - Marketplace Oracle dispute resolutions and custom hold periods.  
+   - Fiat conversion support using third-party APIs.
 
-**Payment**: Estimated $8,000 + Bonus
+2. **Security Audit:**  
+   Pass Audit 2 to ensure new functionality is secure.
+
+**Budget Breakdown:**  
+- Implementation: $5,000  
+- Documentation: $1,000  
+- Audit 2: $3,000  
+
+**Total:** $9,000 + bonus.
 
 ---
 
-## **System and Functional Specifications**
+### **Phase 3: Enhanced Features and Scalability**
+**Objectives:**
+- Add advanced admin features (multi-signature approvals, zk-rollups).
+- Enhance user experience with notifications and streamlined UI.
+- Ensure scalability and security through rigorous testing.
+
+**Deliverables:**
+1. **Features:**  
+   - zk-rollups for efficient transaction processing.  
+   - Multi-signature admin confirmations for critical actions.  
+   - Notification system for transaction updates.  
+
+2. **Security Audit:**  
+   Pass Audit 3 to validate scalability and final feature set.
+
+**Budget:**  
+$8,000 + bonus.
+
+---
+
+## **Functional Specifications**
 
 ### **1. Admin Functions**
+Accessible via `/admin`, admin functions are controlled through secure key authentication.
 
-Admin functions are accessible through the **Admin Panel** (`blockhead.box/admin`) and control system-wide operations, such as configuring oracles, managing wallets, setting fees, and pausing operations.
+#### **Features and Methods**
+1. **Admin Authentication:**  
+   Securely authenticate admins using wallet keys stored in the smart contract.  
+   ```solidity
+   mapping(address => bool) public admins;
 
-#### **Admin Login**
-- **Description**: The first admin key and confirmation key are encoded within the smart contract and are used to authenticate the admin user.
-- **Example**: The `adminLogin()` function checks that the caller is authorized.
+   function isAdmin(address _address) public view returns (bool) {
+       return admins[_address];
+   }
 
-```solidity
-function adminLogin(address _adminAddress) public view returns (bool) {
-    require(msg.sender == _adminAddress, "Unauthorized: Only the admin can access");
-    return true;
-}
-```
+   function addAdmin(address _newAdmin) public onlyAdmin {
+       admins[_newAdmin] = true;
+   }
+   ```
 
-#### **Admin Transfer**
-- **Description**: The admin can transfer control to a new admin by confirming the change with a second key.
-- **Process**:
-  - The admin issues the `transferAdmin` function to set a new admin address.
-  - The change must be confirmed by a second key.
-- **Example**: 
-```solidity
-address public adminAddress;
+2. **Transfer Admin Control:**  
+   Allow admin role transfer with secondary confirmation.  
+   ```solidity
+   function transferAdmin(address _newAdmin) external onlyAdmin {
+       require(_newAdmin != address(0), "Invalid admin address");
+       pendingAdmin = _newAdmin;
+   }
 
-function transferAdmin(address newAdmin) public onlyAdmin {
-    require(msg.sender == adminAddress, "Unauthorized: Not the admin");
-    adminAddress = newAdmin;
-}
-```
+   function confirmTransfer() external {
+       require(msg.sender == pendingAdmin, "Not pending admin");
+       admin = pendingAdmin;
+   }
+   ```
 
-#### **Shut-off Switch**
-- **Description**: The shut-off switch pauses all operational smart contracts, halting invoice creation and payments.
-- **Example**:
-```solidity
-bool public paused = false;
+3. **Shut Off Switch:**  
+   Pause all contract operations during emergencies.  
+   ```solidity
+   function emergencyPause() external onlyAdmin {
+       _pause();
+   }
 
-function togglePause() public onlyAdmin {
-    paused = !paused;
-    emit PauseToggled(paused);
-}
-```
+   function resume() external onlyAdmin {
+       _unpause();
+   }
+   ```
 
-#### **Configure Oracle**
-- **Description**: Set the address of the marketplace oracle that will be responsible for managing invoice creation, dispute resolution, and payment reallocation.
-- **Example**:
-```solidity
-address public marketplaceOracle;
-
-function configureMarketplaceOracle(address oracleAddress) public onlyAdmin {
-    marketplaceOracle = oracleAddress;
-}
-```
-
-#### **Set Gas Fee**
-- **Description**: The gas fee is adjustable by the admin to handle extreme network conditions.
-- **Example**:
-```solidity
-uint256 public gasFee;
-
-function setGasFee(uint256 newGasFee) public onlyAdmin {
-    gasFee = newGasFee;
-}
-```
+4. **Set Fees and Configurations:**  
+   Configure gas fees, escrow wallets, and marketplace oracle addresses.  
 
 ---
 
-### **2. Invoice Creation**
+### **2. Invoice Management**
+Invoice creation, payment, and lifecycle management are the core features of Blockhead.
 
-Invoices are created by **Invoice Creators** (typically sellers) on **blockhead.box/invoice/create**.
+#### **Invoice Creation Workflow**
+1. Creator enters details (amount, expiration, payer address).
+2. Smart contract validates input and stores data securely.
+3. System generates a unique invoice ID, escrow address, and payment link.
 
-#### **Invoice Data**:
-- **Amount** in MATIC
-- **Expiration** (max 180 days)
-- **Release Address** (where funds will be sent upon release)
-- **Public Key** (to verify identity)
-
-#### **Contract Generation**:
-Upon submitting the invoice data, the system generates:
-- A unique **Invoice ID**
-- A unique **Escrow Wallet Address**
-- A **Payment URL** for the **Invoice Payer**
-
-#### **Smart Contract for Invoice Creation**:
+#### **Smart Contract Example**
 ```solidity
 struct Invoice {
-    uint256 amount;
-    uint256 expiration;
+    uint256 id;
     address creator;
     address payer;
-    address releaseAddress;
-    uint256 createdAt;
-    string status; // "Created", "Paid", "Accepted", etc.
+    uint256 amount;
+    uint256 expiration;
+    string state; // "Created", "Paid", "Accepted", etc.
 }
 
-mapping(uint256 => Invoice) public invoices;
+Invoice[] public invoices;
 
-function createInvoice(uint256 _amount, uint256 _expiration, address _releaseAddress) public returns (uint256) {
-    uint256 invoiceId = uint256(keccak256(abi.encodePacked(block.timestamp, msg.sender, _releaseAddress, _amount)));
-    invoices[invoiceId] = Invoice({
+function createInvoice(
+    address _payer,
+    uint256 _amount,
+    uint256 _expiration
+) external returns (uint256) {
+    require(_expiration > block.timestamp, "Expiration must be in the future");
+
+    uint256 invoiceId = invoices.length;
+    invoices.push(Invoice({
+        id: invoiceId,
+        creator: msg.sender,
+        payer: _payer,
         amount: _amount,
         expiration: _expiration,
-        creator: msg.sender,
-        payer: address(0),
-        releaseAddress: _releaseAddress,
-        createdAt: block.timestamp,
-        status: "Created"
-    });
+        state: "Created"
+    }));
+
     return invoiceId;
 }
 ```
 
 ---
 
-### **3. Invoice Payment**
+### **3. Payment Handling**
+Payers interact with invoices via unique payment URLs. Blockchain Oracles monitor payments and update states.
 
-- **Invoice Payer** receives the invoice URL and logs in with a wallet (e.g., MetaMask).
-- **Blockchain Oracle** begins monitoring the blockchain for transactions to the invoice address.
+#### **States:**
+- `Created`: Invoice created and awaiting payment.
+- `Paid`: Payment received; awaiting creator acceptance.
+- `Underpaid/Overpaid`: Payment mismatch with invoice amount.
+- `Cancelled`: Invoice cancelled; funds refunded.
+- `Disputed`: Escrow funds held for Marketplace Oracle resolution.
 
-#### **Example: Payment Monitoring**:
+---
+
+### **4. Refunds**
+Refunds are triggered automatically for:
+1. Underpayments exceeding gas fees.
+2. Cancelled invoices.
+3. Marketplace Oracle reallocations.
+
+#### **Refund Workflow**
+1. Funds returned to payer’s sending address.  
+2. State updated to "Refunded".
+
+#### **Smart Contract Example**
 ```solidity
-function payInvoice(uint256 invoiceId) public payable {
-    Invoice storage invoice = invoices[invoiceId];
-    require(msg.value == invoice.amount, "Incorrect payment amount");
-    invoice.status = "Payment Received";
-    emit InvoicePaid(invoiceId, msg.sender, msg.value);
+function refund(uint256 _invoiceId) external {
+    Invoice storage invoice = invoices[_invoiceId];
+    require(invoice.state == "Cancelled", "Invoice not eligible for refund");
+
+    payable(invoice.payer).transfer(invoice.amount);
+    invoice.state = "Refunded";
 }
 ```
 
 ---
 
-### **4. Invoice Acceptance & Cancellation**
+### **5. Marketplace Oracles**
+Marketplace Oracles enhance functionality by enabling:
+1. **Custom Hold Periods:** Assign specific hold durations per invoice creator.  
+2. **Dispute Resolution:** Reallocate funds between payer and creator.
 
-- **Invoice Creator** can accept or cancel the invoice.
-- **Market Oracle** can also cancel an invoice or reallocate funds if a dispute arises.
-
-#### **Invoice Acceptance**:
-The creator accepts the invoice and funds are transferred from the escrow wallet to the release address.
-
+#### **Integration Example**
+Utilize Chainlink to automate invoice state updates and release funds:  
 ```solidity
-function acceptInvoice(uint256 invoiceId) public {
-    Invoice storage invoice = invoices[invoiceId];
-    require(msg.sender == invoice.creator, "Only the creator can accept the invoice");
-    require(keccak256(bytes(invoice.status)) == keccak256(bytes("Payment Received")), "Payment not received");
-
-    // Transfer funds from Escrow wallet to the Invoice Creator's address
-    payable(invoice.releaseAddress).transfer(invoice.amount);
-    invoice.status = "Accepted";
+function settleDispute(uint256 _invoiceId, uint256 _creatorAmount, uint256 _payerAmount) external onlyOracle {
+    require(_creatorAmount + _payerAmount == invoices[_invoiceId].amount, "Invalid allocation");
+    
+    payable(invoices[_invoiceId].creator).transfer(_creatorAmount);
+    payable(invoices[_invoiceId].payer).transfer(_payerAmount);
+    invoices[_invoiceId].state = "DisputedSettled";
 }
 ```
 
 ---
 
-### **5. Invoice Release**
-
-When conditions are met (payment accepted, hold period exceeded), funds are released to the **Invoice Creator**. If the invoice is disputed, the **Marketplace Oracle** may adjust the release terms.
-
-#### **Example: Invoice Release**:
-```solidity
-function releaseInvoice(uint256 invoiceId) public {
-    Invoice storage invoice = invoices[invoiceId];
-    require(keccak256(bytes(invoice.status)) == keccak256(bytes("Accepted")), "Invoice not accepted yet");
-    require(block.timestamp >= invoice.createdAt + invoice.expiration, "Hold period not exceeded");
-
-    // Transfer funds from the Escrow Wallet to the Creator
-    payable(invoice.releaseAddress).transfer(invoice.amount);
-    invoice.status = "Released";
-}
-```
+Here’s the refined, enriched, and organized specification for the **Website**, **Escrow Wallet**, and **Notifications** sections. These improvements include precise details, enhanced structure, and additional context. This will be integrated into the overall document seamlessly.
 
 ---
 
-### **6. Refund Functions**
+## **Website: `blockhead.box`**
 
-- **Underpayment**: If the payer sends less than the required amount, the invoice can be canceled, or the difference refunded.
-- **Overpayment**: Any excess over the required amount (minus transaction fees) is refunded.
+The Blockhead website is a React-based static site hosted on IPFS, providing the frontend interface for users to manage invoices and payments. 
 
-#### **Example: Refund Function**:
-```solidity
-function refundInvoice(uint256 invoiceId) public {
-    Invoice storage invoice = invoices[invoiceId];
-    require(keccak256(bytes(invoice.status)) == keccak256(bytes("Underpaid")) || keccak256(bytes(invoice.status)) == keccak256(bytes("Cancelled")), "Refund not applicable");
+### **Hosting and Infrastructure**
+- **Hosting:**  
+  - IPFS via Fleek or 4everland for decentralized, robust hosting.
+  - Test server deployment on Vercel during development and testing phases.  
+- **Domain Management:**  
+  - `.box` domain handled via `my.box` and `3dns.box`.
 
-    payable(invoice.payer).transfer(invoice.amount);  // Refund payer
-    invoice.status = "Refunded";
-}
-```
+### **Core Features and Pages**
+The website uses **WalletConnect** for user authentication and features a responsive, Bootstrap-based design with a right-sidebar layout. Minimal styling is applied initially, with advanced designs planned for **Phase 3**.
 
----
+#### **1. Default Landing Page**
+- **Purpose:** Serve as the entry point for Blockhead users.  
+- **Contents:**  
+  - **Explanation Text:** Brief overview of Blockhead and its features.  
+  - **Login:** WalletConnect login button for users.  
+  - **GitHub Link:** Redirect to the project’s GitHub repository for transparency.  
 
-### **7. Marketplace Oracles**
+#### **2. Navbar**
+- **Dynamic Links:**  
+  - `Create Invoice`  
+  - `Invoice List`  
+  - `Find Invoice`  
+  - `Admin` (visible only to wallets with admin privileges).  
 
-**Marketplace Oracles** are responsible for handling more complex interactions:
-- Invoice creation
-- Dispute resolution
-- Hold periods
+#### **3. Pay Invoice Page**
+- **Purpose:** Allow payers to view invoice details and make payments.  
+- **Access:** URL is shared by the Invoice Creator with the Invoice Payer.  
+- **Features:**  
+  - Displays all invoice details except the payment address.  
+  - Requires WalletConnect login to reveal the payment address.
 
-#### **Marketplace Oracle Invoice Creation**:
-```sol
+#### **4. Create Invoice Page**
+- **Purpose:** Enable Invoice Creators to generate new invoices.  
+- **Features:**  
+  - Fields to enter invoice details (amount, expiration, payer wallet address).  
+  - Generates a unique Invoice ID and corresponding payment link.  
 
-idity
-function createMarketplaceInvoice(address _payer, uint256 _amount, uint256 _expiration) public {
-    // Oracle logic for creating and assigning invoice
-}
-```
+#### **5. Invoice List Page**
+- **Purpose:** Allow logged-in users to view a list of invoices.  
+- **Features:**  
+  - Sortable columns: status, date created, date paid, creator ID, payer ID.  
+  - Search functionality by Invoice ID, address, or state.  
 
----
+#### **6. Invoice Page**
+- **Purpose:** Display the current state and history of an individual invoice.  
+- **Features:**  
+  - Details: Invoice ID, amount, status, payer, and creator.  
+  - Actions: Creators can cancel the invoice directly from this page.  
 
-## **Website Structure**
-
-The website provides the front-end interface for interaction with the Blockhead system.
-
-### **Pages**:
-1. **Landing Page**: Displays general information about Blockhead and a login option.
-2. **Invoice Creation**: Form for creating a new invoice.
-3. **Invoice List**: Displays all the user's invoices with statuses.
-4. **Invoice Pay Page**: Allows the payer to settle the invoice by sending payment.
-
-### **UI Components**:
-- **Navbar**: Includes links to create invoices, view invoices, admin (conditional on wallet key).
-- **Invoice Management**: For creators to manage their invoices, including accepting, canceling, or viewing status.
+#### **7. Admin Page**
+- **Purpose:** Provide administrators with controls to configure system settings.  
+- **Access:** Restricted to wallets with admin privileges.  
+- **Features:**  
+  - Adjust fees, configure oracles, and manage escrow wallet addresses.  
+  - Set blacklists, hold times, and trigger circuit breakers.
 
 ---
 
 ## **Escrow Wallet**
 
-The **Escrow Wallet** holds payments until release conditions are met. Each invoice is assigned a unique wallet address generated from the admin's settings.
+The **Escrow Wallet** is a critical component of the Blockhead system, securely holding funds until release conditions are met.
+
+### **Key Features**
+1. **Deterministic Address Generation:**  
+   Each invoice payment receives a unique wallet address derived deterministically from a secure key set by the admin.  
+
+2. **Payment Security:**  
+   - Funds are locked in the escrow wallet until the invoice is accepted, refunded, or disputed.  
+   - Supports refunds for overpayments or cancellations.  
+
+3. **Admin Configuration:**  
+   The wallet address is configured and maintained by the admin, ensuring flexibility and control.
+
+### **Planned Enhancements (Phase 2):**
+- Advanced security mechanisms for deterministic address generation.  
+- Integration with zk-rollups for scalability and reduced transaction fees.  
 
 ---
 
 ## **Notifications**
 
-Notifications are sent via:
-- **Marketplace Oracles**: For dispute resolutions and invoice reallocation.
-- **Wallet Messaging**: For other user actions (e.g., invoice updates).
+### **Phase 2: Marketplace Oracle Notifications**
+- Notifications generated through the **Marketplace Oracle** to inform users of key state changes.  
+- Examples of notifications:  
+  - Dispute initiated by a Marketplace Oracle.  
+  - Resolution or allocation of escrow funds.
+
+### **Phase 3: Wallet Messaging**
+- **Real-Time Updates:**  
+  Use wallet-based messaging protocols to notify users about the status of their invoices, payments, or disputes.  
+- **Examples:**  
+  - Invoice accepted or cancelled.  
+  - Payment received or refunded.  
+
+---
+
+## **Summary of Enhancements**
+
+1. **Website:**  
+   - Organized feature list for each page, emphasizing user roles and dynamic functionality.  
+   - Clarity on hosting and domain infrastructure.  
+
+2. **Escrow Wallet:**  
+   - Added detailed information on deterministic address generation and admin configurations.  
+   - Highlighted future scalability with zk-rollups.  
+
+3. **Notifications:**  
+   - Clear separation of notification phases (Marketplace Oracle vs. Wallet Messaging).  
+   - Examples of real-time updates to enhance user experience.  
+
+This refined and enriched specification will enhance usability and technical clarity while integrating seamlessly into the overarching Blockhead project framework.
