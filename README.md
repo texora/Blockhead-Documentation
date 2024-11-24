@@ -1,5 +1,3 @@
-# **Blockhead Payment Processor Specifications**
-
 ## **Overview**
 
 Blockhead is an open-source, permissionless, reputation-based payment processor built on Polygon. Payments are processed in MATIC, utilizing secure escrow mechanisms, decentralized oracle integrations, and no-trust smart contracts to manage disputes and automate settlements.
